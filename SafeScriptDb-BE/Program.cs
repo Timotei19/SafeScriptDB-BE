@@ -1,7 +1,9 @@
 using Business_Logic_Layer.AppConstants;
 using Business_Logic_Layer.IAuditModule;
+using Business_Logic_Layer.Interfaces;
 using Business_Logic_Layer.IUpdateScripts;
 using Business_Logic_Layer.LogsModule;
+using Business_Logic_Layer.Services;
 using Business_Logic_Layer.UpdateScripts;
 using Data_Access_Layer;
 using Data_Access_Layer.Repositories;
@@ -28,11 +30,19 @@ builder.Services.AddCors(options =>
 
 // Register services
 //builder.Services.AddScoped<IDataAccessLayer, DataAccessLayer>(); // Example: register your data access layer
-builder.Services.AddScoped<IServerService, ServerService>();
-builder.Services.AddSingleton<IDatabaseSettings, Business_Logic_Layer.AppConstants.DatabaseSettings>();
+builder.Services.AddScoped<IDatabaseSettings, Business_Logic_Layer.AppConstants.DatabaseSettings>();
+// Correctly registered as Scoped
+builder.Services.AddScoped<IAuditRepository, AuditRepository>();
 builder.Services.AddScoped<IAuditService, AuditService>();
+builder.Services.AddScoped<IServerService, ServerService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+var connectionString = AppDatabaseSettings.GetApplicationConnectionString();
+Console.WriteLine($"Connection String: {connectionString}");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-       options.UseSqlServer(AppDatabaseSettings.GetApplicationConnectionString()));
+    options.UseSqlServer(connectionString));
+
 
 builder.Services.AddScoped<IAuditRepository, AuditRepository>();
 // Add services to the container.

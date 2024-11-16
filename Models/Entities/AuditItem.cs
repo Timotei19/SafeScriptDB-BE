@@ -8,9 +8,9 @@ namespace Models.Entities
 
         public string ScriptName { get; set; }
 
-        public int Status { get; set; }
+        public int StatusId { get; set; }
 
-        public int Result { get; set; }
+        //public int Result { get; set; }
 
         public string ResultMessage { get; set; }
 

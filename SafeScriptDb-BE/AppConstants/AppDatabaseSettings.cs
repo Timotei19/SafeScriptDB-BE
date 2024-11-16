@@ -6,7 +6,7 @@
 
         public static string SQLServerInstanceKey = @"SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL";
 
-        public static string ServerName = "OMR1-LDL-IT5729\\MSSQLSERVER01";
+        public static string ServerName = "RO-2ZJ9GG3\\SQLEXPRESS";
 
         public static string ServerUsername = "licenta";
 

@@ -6,6 +6,6 @@
 
         void SetConnectionString(string server, string username, string password, string tenant = "Admin");
 
-        string GetApplicationConnectionString();
+        string GetTenantConnectionString(string tenant);
     }
 }

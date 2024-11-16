@@ -17,7 +17,15 @@ namespace Data_Access_Layer.Repositories
         {
             _context.Audits.Add(audit);
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+
         }
 
         public async Task<List<Audit>> GetAllAudits()

@@ -8,7 +8,7 @@ namespace Business_Logic_Layer.AppConstants
 
          public static string SQLServerInstanceKey = @"SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL";
 
-         public static string ServerName = "OMR1-LDL-IT5729\\MSSQLSERVER01";
+         public static string ServerName = "RO-2ZJ9GG3\\SQLEXPRESS";
 
          public static string ServerUsername = "licenta";
 
@@ -16,9 +16,9 @@ namespace Business_Logic_Layer.AppConstants
 
         private string _connectionString;
 
-        public string GetApplicationConnectionString()
+        public string GetTenantConnectionString(string tenant)
         {
-            return $"Data Source={ServerName};Initial Catalog='Admin';Password={ServerPassword};User ID={ServerUsername}; MultipleActiveResultSets=True;Max Pool Size=300;PoolBlockingPeriod=NeverBlock;TrustServerCertificate=True;Encrypt=false;";
+            return $"Data Source={ServerName};Initial Catalog={tenant};Password={ServerPassword};User ID={ServerUsername}; MultipleActiveResultSets=True;Max Pool Size=300;PoolBlockingPeriod=NeverBlock;TrustServerCertificate=True;Encrypt=false;";
         }
 
         public string GetConnectionString()
@@ -29,6 +29,11 @@ namespace Business_Logic_Layer.AppConstants
         public void SetConnectionString(string server, string username, string password, string tenant = "Admin")
         {
             _connectionString = $"Data Source={server};Initial Catalog={tenant};Password={password};User ID={username}; MultipleActiveResultSets=True;Max Pool Size=300;PoolBlockingPeriod=NeverBlock;TrustServerCertificate=True;Encrypt=false;";
+        }
+
+        public static string GetApplicationConnectionString()
+        {
+            return $"Data Source={ServerName};Initial Catalog='Admin';Password={ServerPassword};User ID={ServerUsername}; MultipleActiveResultSets=True;Max Pool Size=300;PoolBlockingPeriod=NeverBlock;TrustServerCertificate=True;Encrypt=false;";
         }
     }
 }

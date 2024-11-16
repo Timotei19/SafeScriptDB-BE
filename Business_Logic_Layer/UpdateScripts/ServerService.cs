@@ -7,14 +7,8 @@ using Microsoft.Data.SqlClient;
 using Models.AppConstants;
 using Models.DTOs;
 using Models.Entities;
-using SafeScriptDb_BE.AppConstants;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Drawing.Printing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Business_Logic_Layer.UpdateScripts
 {
@@ -62,17 +56,17 @@ namespace Business_Logic_Layer.UpdateScripts
                 {
                     StartDate = DateTime.Now,
                     DatabaseName = tenant,
-                    Status = (int)Enums.Status.NotStarted,
+                    StatusId = (int)Enums.Status.NotStarted,
                     AuditItems = new List<AuditItem>()
                 };
                 try
                 {
 
-                    var connectionString = _databaseSettings.GetConnectionString();
+                    var tennantConnectionString = _databaseSettings.GetTenantConnectionString(tenant);
 
-                    using (var connection = new SqlConnection(connectionString))
+                    using (var connection = new SqlConnection(tennantConnectionString))
                     {
-                        audit.Status = (int)Enums.Status.InProgress;
+                        audit.StatusId = (int)Enums.Status.InProgress;
 
                         await connection.OpenAsync();
                         using (var transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
@@ -84,7 +78,7 @@ namespace Business_Logic_Layer.UpdateScripts
                                     var fileAudit = new AuditItem
                                     {
                                         ScriptName = file.Name,
-                                        Status = (int)Enums.Status.InProgress
+                                        StatusId = (int)Enums.Status.InProgress
                                     };
 
                                     audit.AuditItems.Add(fileAudit);
@@ -100,33 +94,36 @@ namespace Business_Logic_Layer.UpdateScripts
 
                                     var fileAuditToUpdate = audit.AuditItems.LastOrDefault();
 
-                                    fileAuditToUpdate.Result = (int)Enums.Result.Success;
-                                    fileAuditToUpdate.ResultMessage = "Success";
+                                    fileAuditToUpdate.ResultMessage = Enums.Result.Success.ToString();
                                 }
 
                                 transaction.Commit();
 
-                                audit.Result = (int)Enums.Result.Success;
+                                //audit.Result = (int)Enums.Result.Success;
                             }
                             catch (Exception ex)
                             {
+                                var failedAuditItem = audit.AuditItems.LastOrDefault();
+                                failedAuditItem.StatusId = (int)Enums.Status.Failed;
+                                failedAuditItem.ResultMessage = ex.Message;
+                                
                                 transaction.Rollback();
 
                                 audit.RollbackDone = true;
 
-                                //AddExceptionAudit(ex, audit);
+                                await AddExceptionAudit(ex, audit);
                             }
                         }
                     }
 
                     audit.EndDate = DateTime.Now;
-                    audit.Status = (int)Enums.Status.Finished;
+                    audit.StatusId = (int)Enums.Status.Finished;
 
                     //await AddAudit(audit);
                 }
                 catch (Exception ex)
                 {
-                    AddExceptionAudit(ex, audit);
+                    await AddExceptionAudit(ex, audit);
                 }
             }
 
@@ -135,9 +132,8 @@ namespace Business_Logic_Layer.UpdateScripts
 
         private async Task AddExceptionAudit(Exception ex, Audit audit)
         {
-            audit.Status = (int)Enums.Status.Failed;
+            audit.StatusId = (int)Enums.Status.Failed;
             audit.EndDate = DateTime.Now;
-            audit.Result = (int)Enums.Result.Failed;
             audit.AuditItems.LastOrDefault().ResultMessage = ex.Message;
 
             await AddAudit(audit);
@@ -147,6 +143,5 @@ namespace Business_Logic_Layer.UpdateScripts
         {
             await _auditRepository.CreateAudit(audit);
         }
-
     }
 }

@@ -15,6 +15,10 @@ namespace Models.DbConfigurations
             builder.HasMany(a => a.AuditItems)
             .WithOne(ai => ai.Audit)
             .HasForeignKey(ai => ai.AuditId);
+
+            builder.HasOne<Status>()
+                   .WithMany()
+                   .HasForeignKey(a => a.StatusId);
         }
     }
 }

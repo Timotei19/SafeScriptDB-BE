@@ -1,5 +1,7 @@
 ﻿using Business_Logic_Layer.IAuditModule;
+using Business_Logic_Layer.Interfaces;
 using Business_Logic_Layer.IUpdateScripts;
+using Data_Access_Layer.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Models.DTOs;
 using Models.Entities;
@@ -13,24 +15,22 @@ namespace SafeScriptDb_BE.Controllers
     {
         private readonly IServerService _serverService;
         private readonly IAuditService _auditService;
+        private readonly IUserService _userService;
 
-        public UsersController(IServerService serverService, IAuditService auditService)
+        public UsersController(IServerService serverService, IAuditService auditService, IUserService userService)
         {
             _serverService = serverService;
             _auditService = auditService;
+            _userService = userService;
         }
 
-        [HttpGet("")]
-        [ProducesResponseType(typeof(List<User>), 200)]
+
+        [HttpGet("GetAllUsers")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(List<UserDTO>), 200)]
         public async Task<IActionResult> GetAllUsers()
         {
-            var users = new List<User>
-            {
-                new User { Id = 1, Name = "John Doe", Email = "johndoe@example.com" },
-                new User { Id = 2, Name = "Jane Smith", Email = "janesmith@example.com" },
-                new User { Id = 3, Name = "Alice Johnson", Email = "alice@example.com" }
-            };
-
+            var users = await _userService.GetAllUsersWithRolesAsync();
             return Ok(users);
         }
 
@@ -70,11 +70,14 @@ namespace SafeScriptDb_BE.Controllers
 
         [HttpGet("GetAudits")]
         [ProducesResponseType(typeof(List<Audit>), 200)]
-        public async Task<IActionResult> GetAudits()
+        public async Task<IActionResult> GetAudits([FromQuery] PagedRequest pagedRequest)
         {
-            var audits = await _auditService.GetAllAudits();
-
+            var audits = await _auditService.GetPagedAudits(pagedRequest);
             return Ok(audits);
+
+            //var audits = await _auditService.GetAllAudits();
+
+            //return Ok(audits);
         }
     }
 }

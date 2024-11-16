@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Models.Entities
+﻿namespace Data_Access_Layer.Repositories
 {
-    public class User
+    public class UserDTO
     {
         public int ID { get; set; }
         public string Email { get; set; }
@@ -14,6 +8,6 @@ namespace Models.Entities
         public string LastName { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public ICollection<UserRole> UserRoles { get; set; }
+        public List<string> Roles { get; set; }
     }
 }
