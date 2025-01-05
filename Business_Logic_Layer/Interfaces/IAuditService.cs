@@ -1,8 +1,7 @@
-﻿
-using Models.DTOs;
+﻿using Models.DTOs;
 using Models.Entities;
 
-namespace Business_Logic_Layer.IAuditModule
+namespace Business_Logic_Layer.Interfaces
 {
     public interface IAuditService
     {

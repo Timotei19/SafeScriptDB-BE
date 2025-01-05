@@ -1,19 +1,13 @@
-﻿using Business_Logic_Layer.IAuditModule;
+﻿using Business_Logic_Layer.Interfaces;
 using Data_Access_Layer;
-using Data_Access_Layer.Repositories;
 using Data_Access_Layer.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
 using Models.DTOs;
 using Models.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Business_Logic_Layer.LogsModule
 {
-    public class AuditService: IAuditService
+    public class AuditService : IAuditService
     {
         private readonly IAuditRepository _auditRepository;
         private readonly ApplicationDbContext _applicationDbContext;
@@ -48,12 +42,15 @@ namespace Business_Logic_Layer.LogsModule
                 query = query.Where(a => a.EndDate <= pagedRequest.EndDate.Value);
             }
 
-            // Sorting
+            if (pagedRequest.UserId != null)
+            {
+
+            }
+
             query = pagedRequest.SortDesc
                 ? query.OrderByDescending(e => EF.Property<object>(e, pagedRequest.SortBy))
                 : query.OrderBy(e => EF.Property<object>(e, pagedRequest.SortBy));
 
-            // Pagination
             var totalRecords = await query.CountAsync();
             var audits = await query.Skip((pagedRequest.Page - 1) * pagedRequest.PageSize)
                                     .Take(pagedRequest.PageSize)
@@ -65,6 +62,5 @@ namespace Business_Logic_Layer.LogsModule
                 TotalRecords = totalRecords
             };
         }
-
     }
 }

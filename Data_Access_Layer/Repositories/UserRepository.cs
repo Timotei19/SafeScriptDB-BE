@@ -1,17 +1,12 @@
 ﻿using Data_Access_Layer.RepositoryInterfaces;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Models.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using User = Models.Entities.User;
 
 namespace Data_Access_Layer.Repositories
 {
-    public class UserRepository: IUserRepository
+    public class UserRepository : IUserRepository
     {
         private readonly string _connectionString;
         private readonly ApplicationDbContext _context;
@@ -34,10 +29,9 @@ namespace Data_Access_Layer.Repositories
                     .ThenInclude(ur => ur.Role) // Include the Role entity through UserRoles
                 .Select(u => new UserDTO
                 {
-                    ID = u.ID,
+                    Id = u.Id,
                     Email = u.Email,
-                    FirstName = u.FirstName,
-                    LastName = u.LastName,
+                    UserName = u.UserName,
                     Roles = u.UserRoles.Select(ur => ur.Role.RoleName).ToList()
                 })
                 .ToListAsync();
@@ -45,12 +39,43 @@ namespace Data_Access_Layer.Repositories
             return users;
         }
 
-        public async Task<List<Role>> GetAllUserRolesAsync(int userId)
+        public async Task<IEnumerable<Role>> GetAllUserRolesAsync(int userId)
         {
-            var user = await _context.Users.Where(u => u.ID == userId)
-                            .Include(u => u.UserRoles)
-                                .ThenInclude(ur => ur.Role)
-                                    .FirstOrDefaultAsync();
+            var roles = await _context.Users
+                    .Where(u => u.Id == userId)
+                    .Include(u => u.UserRoles)
+                        .ThenInclude(ur => ur.Role)
+                    .SelectMany(u => u.UserRoles.Select(ur => ur.Role))
+                    .ToListAsync();
+
+            return roles;
         }
+
+        public async Task<User> GetUserById(int userId)
+        {
+            var user = await _context.Users.Where(u => u.Id == userId).FirstOrDefaultAsync();
+
+            return user;
+        }
+
+        public async Task DeleteUser(User user)
+        {
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user), "The user to delete cannot be null.");
+            }
+            var userRoles = _context.UserRole.Where(ur => ur.UserId == user.Id);
+            _context.UserRole.RemoveRange(userRoles);
+
+            if (_context.Entry(user).State == EntityState.Detached)
+            {
+                _context.Users.Attach(user);
+            }
+
+            _context.Users.Remove(user);
+
+            await _context.SaveChangesAsync();
+        }
+
     }
 }

@@ -1,6 +1,4 @@
-﻿using Microsoft.SqlServer.Management.Smo;
-
-namespace Business_Logic_Layer.AppConstants
+﻿namespace Business_Logic_Layer.AppConstants
 {
     public class DatabaseSettings : IDatabaseSettings
     {

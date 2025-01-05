@@ -11,10 +11,14 @@
 
         public static string SQLServerInstanceKey = @"SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL";
 
-        public static string ServerName = "dev-database.cqc6jrtecjcj.eu-west-1.rds.amazonaws.com";
+        public static string ServerName = "RO-2ZJ9GG3\\SQLEXPRESS";
 
-        public static string ServerUsername = "ProFusionAPI";
+        public static string ServerUsername = "licenta";
 
-        public static string ServerPassword = "sjaMceSowooOFEyd";
+        public static string ServerPassword = "Audi.A4B6";
+        public static string GetApplicationConnectionString()
+        {
+            return $"Data Source={ServerName};Initial Catalog='Admin';Password={ServerPassword};User ID={ServerUsername}; MultipleActiveResultSets=True;Max Pool Size=300;PoolBlockingPeriod=NeverBlock;TrustServerCertificate=True;Encrypt=false;";
+        }
     }
 }

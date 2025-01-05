@@ -12,8 +12,6 @@
 
         public int StatusId { get; set; }
 
-        //public int Result { get; set; }
-
         public bool RollbackDone { get; set; }
 
         public int UserId { get; set; }

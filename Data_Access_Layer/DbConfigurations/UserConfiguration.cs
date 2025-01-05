@@ -8,9 +8,9 @@ namespace Data_Access_Layer.DbConfigurations
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
-            builder.ToTable("Users");
+            builder.ToTable("AspNetUsers");
 
-            builder.HasKey(u => u.ID);
+            builder.HasKey(u => u.Id);
 
             builder.HasMany(u => u.UserRoles);
         }

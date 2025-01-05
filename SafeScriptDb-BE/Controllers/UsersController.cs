@@ -1,11 +1,9 @@
-﻿using Business_Logic_Layer.IAuditModule;
-using Business_Logic_Layer.Interfaces;
+﻿using Business_Logic_Layer.Interfaces;
 using Business_Logic_Layer.IUpdateScripts;
 using Data_Access_Layer.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Models.DTOs;
 using Models.Entities;
-using System.Diagnostics.Contracts;
 
 namespace SafeScriptDb_BE.Controllers
 {
@@ -24,7 +22,7 @@ namespace SafeScriptDb_BE.Controllers
             _userService = userService;
         }
 
-
+        //[Authorize(Roles = "Admin")]
         [HttpGet("GetAllUsers")]
         [ProducesResponseType(200)]
         [ProducesResponseType(typeof(List<UserDTO>), 200)]
@@ -34,50 +32,33 @@ namespace SafeScriptDb_BE.Controllers
             return Ok(users);
         }
 
-        [HttpPost("PostFolderPath")]
+        [HttpGet("GetUserRoles/{userId}")]
         [ProducesResponseType(200)]
-        public IActionResult PostFolderPath([FromBody] string folderPath)
+        [ProducesResponseType(typeof(IEnumerable<Role>), 200)]
+        public async Task<IActionResult> GetAllUserRoles(int userId)
         {
-            // Process the folder path (e.g., save to database, perform operations, etc.)
-            return Ok($"Received folder path: {folderPath}");
+            var roles = await _userService.GetAllUserRolesAsync(userId);
+            return Ok(roles);
         }
 
-        [HttpPost("ServerConnect")]
-        [ProducesResponseType(typeof(List<string>), 200)]
-        public IActionResult ServerConnect(DbServer credentials)
+        [HttpDelete("DeleteUser/{userId}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> DeleteUser(int userId)
         {
-            var databases = _serverService.GetDatabases(credentials);
+            await _userService.DeleteUserAsync(userId);
 
-            return Ok(databases);
+            return Ok(new { message = "User deleted successfully." });
         }
 
-        [HttpPost("executeSqlOnTenants")]
-
-        [ProducesResponseType(typeof(List<string>), 200)]
-        public async Task<IActionResult> ExecuteSqlOnTenants([FromForm] List<string> databases, [FromForm] List<IFormFile> files)//, [FromForm] List<string> tenantDatabases)
+        [HttpGet("GetUserStatistics")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(IEnumerable<Role>), 200)]
+        public async Task<IActionResult> GetUserStatistics([FromQuery] UserStatisticsRequest userStats)
         {
-            if (files == null || files.Count == 0)
-                return BadRequest("No files uploaded.");
+            var stats = await _userService.GetUserStatisticsAsync(userStats);
 
-            if (databases.Count == 0)
-                return BadRequest("No databases selected.");
-
-
-            await _serverService.ExecuteSqlScripts(databases, files);
-
-            return Ok();
-        }
-
-        [HttpGet("GetAudits")]
-        [ProducesResponseType(typeof(List<Audit>), 200)]
-        public async Task<IActionResult> GetAudits([FromQuery] PagedRequest pagedRequest)
-        {
-            var audits = await _auditService.GetPagedAudits(pagedRequest);
-            return Ok(audits);
-
-            //var audits = await _auditService.GetAllAudits();
-
-            //return Ok(audits);
+            return Ok(stats);
         }
     }
 }

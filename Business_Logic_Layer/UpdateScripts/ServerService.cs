@@ -1,6 +1,7 @@
 ﻿using Business_Logic_Layer.AppConstants;
 using Business_Logic_Layer.IUpdateScripts;
 using Dapper;
+using Data_Access_Layer.ContextInterfaces;
 using Data_Access_Layer.RepositoryInterfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Data.SqlClient;
@@ -17,12 +18,14 @@ namespace Business_Logic_Layer.UpdateScripts
         private readonly IDatabaseSettings _databaseSettings;
         private readonly IAuditRepository _logRepository;
         private readonly IAuditRepository _auditRepository;
+        private readonly IUserContext _userContext;
 
-        public ServerService(IDatabaseSettings databaseSettings, IAuditRepository logRepository, IAuditRepository auditRepository)
+        public ServerService(IDatabaseSettings databaseSettings, IAuditRepository logRepository, IAuditRepository auditRepository, IUserContext userContext)
         {
             _databaseSettings = databaseSettings;
             _logRepository = logRepository;
             _auditRepository = auditRepository;
+            _userContext = userContext;
         }
 
         public List<string> GetDatabases(DbServer credentials)
@@ -57,7 +60,8 @@ namespace Business_Logic_Layer.UpdateScripts
                     StartDate = DateTime.Now,
                     DatabaseName = tenant,
                     StatusId = (int)Enums.Status.NotStarted,
-                    AuditItems = new List<AuditItem>()
+                    AuditItems = new List<AuditItem>(),
+                    UserId = _userContext.UserId
                 };
                 try
                 {
@@ -98,15 +102,13 @@ namespace Business_Logic_Layer.UpdateScripts
                                 }
 
                                 transaction.Commit();
-
-                                //audit.Result = (int)Enums.Result.Success;
                             }
                             catch (Exception ex)
                             {
                                 var failedAuditItem = audit.AuditItems.LastOrDefault();
                                 failedAuditItem.StatusId = (int)Enums.Status.Failed;
                                 failedAuditItem.ResultMessage = ex.Message;
-                                
+
                                 transaction.Rollback();
 
                                 audit.RollbackDone = true;

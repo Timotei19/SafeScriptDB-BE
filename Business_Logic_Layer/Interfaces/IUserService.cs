@@ -1,4 +1,5 @@
 ﻿using Data_Access_Layer.Repositories;
+using Models.DTOs;
 using Models.Entities;
 
 namespace Business_Logic_Layer.Interfaces
@@ -8,5 +9,11 @@ namespace Business_Logic_Layer.Interfaces
         Task<List<User>> GetAllUsersAsync();
 
         Task<List<UserDTO>> GetAllUsersWithRolesAsync();
+
+        Task<IEnumerable<Role>> GetAllUserRolesAsync(int userId);
+
+        Task DeleteUserAsync(int userId);
+
+        Task<UserStatisticsReponse> GetUserStatisticsAsync(UserStatisticsRequest request);
     }
 }

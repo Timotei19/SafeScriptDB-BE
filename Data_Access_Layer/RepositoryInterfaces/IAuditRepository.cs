@@ -1,4 +1,5 @@
-﻿using Models.Entities;
+﻿using Models.DTOs;
+using Models.Entities;
 
 namespace Data_Access_Layer.RepositoryInterfaces
 {
@@ -7,5 +8,7 @@ namespace Data_Access_Layer.RepositoryInterfaces
         public Task CreateAudit(Audit audit);
 
         public Task<List<Audit>> GetAllAudits();
+
+        Task<UserStatisticsReponse> GetUserStatisticsAsync(UserStatisticsRequest userStatsReq);
     }
 }

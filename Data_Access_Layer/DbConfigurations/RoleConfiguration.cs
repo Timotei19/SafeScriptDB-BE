@@ -1,11 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Models.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Data_Access_Layer.DbConfigurations
 {
@@ -15,9 +10,7 @@ namespace Data_Access_Layer.DbConfigurations
         {
             builder.ToTable("Roles");
 
-            builder.HasKey(r => r.ID);
-
-            builder.HasMany(r => r.UserRoles);
+            builder.HasKey(r => r.Id);
         }
     }
 }

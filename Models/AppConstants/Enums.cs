@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Models.AppConstants
+﻿namespace Models.AppConstants
 {
     public class Enums
     {
@@ -20,6 +14,12 @@ namespace Models.AppConstants
         {
             Failed = 0,
             Success = 1,
+        }
+
+        public enum Role
+        {
+            Admin = 1,
+            User = 2,
         }
     }
 }
