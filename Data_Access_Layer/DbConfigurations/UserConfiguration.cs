@@ -12,7 +12,7 @@ namespace Data_Access_Layer.DbConfigurations
 
             builder.HasKey(u => u.Id);
 
-            builder.HasMany(u => u.UserRoles);
+            builder.HasOne(u => u.UserRole);
         }
     }
 }

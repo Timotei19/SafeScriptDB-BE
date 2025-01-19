@@ -10,10 +10,11 @@ namespace Business_Logic_Layer.Interfaces
 
         Task<List<UserDTO>> GetAllUsersWithRolesAsync();
 
-        Task<IEnumerable<Role>> GetAllUserRolesAsync(int userId);
+        //Task<IEnumerable<Role>> GetAllUserRolesAsync(int userId);
 
         Task DeleteUserAsync(int userId);
 
         Task<UserStatisticsReponse> GetUserStatisticsAsync(UserStatisticsRequest request);
+        Task<UserDTO> UpdateUserAsync(UserDTO updateUserDto);
     }
 }

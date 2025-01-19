@@ -32,14 +32,14 @@ namespace SafeScriptDb_BE.Controllers
             return Ok(users);
         }
 
-        [HttpGet("GetUserRoles/{userId}")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(typeof(IEnumerable<Role>), 200)]
-        public async Task<IActionResult> GetAllUserRoles(int userId)
-        {
-            var roles = await _userService.GetAllUserRolesAsync(userId);
-            return Ok(roles);
-        }
+        //[HttpGet("GetUserRoles/{userId}")]
+        //[ProducesResponseType(200)]
+        //[ProducesResponseType(typeof(IEnumerable<Role>), 200)]
+        //public async Task<IActionResult> GetAllUserRoles(int userId)
+        //{
+        //    var roles = await _userService.GetAllUserRolesAsync(userId);
+        //    return Ok(roles);
+        //}
 
         [HttpDelete("DeleteUser/{userId}")]
         [ProducesResponseType(200)]
@@ -60,5 +60,34 @@ namespace SafeScriptDb_BE.Controllers
 
             return Ok(stats);
         }
+
+        [HttpPut("UpdateUser/{userId}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> UpdateUser([FromBody] UserDTO updateUserDto)
+        {
+            try
+            {
+            if (updateUserDto == null)
+            {
+                return BadRequest(new { message = "Invalid user data." });
+            }
+
+            var updatedUser = await _userService.UpdateUserAsync(updateUserDto);
+
+            if (updatedUser == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+
+            return Ok(updatedUser);
+        }
+            catch(Exception ex) 
+            {
+                throw new Exception($"User not found.");
+    }
+
+}
     }
 }

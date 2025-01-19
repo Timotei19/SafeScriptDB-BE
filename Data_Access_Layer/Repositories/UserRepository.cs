@@ -1,7 +1,10 @@
 ﻿using Data_Access_Layer.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.SqlServer.Management.Smo;
+using Models.AppConstants;
 using Models.Entities;
+using System.CodeDom;
 using User = Models.Entities.User;
 
 namespace Data_Access_Layer.Repositories
@@ -24,22 +27,21 @@ namespace Data_Access_Layer.Repositories
 
         public async Task<List<UserDTO>> GetAllUsersWithRolesAsync()
         {
-            var users = await _context.Users
-                .Include(u => u.UserRoles)
-                    .ThenInclude(ur => ur.Role) // Include the Role entity through UserRoles
+                var users = await _context.Users
+                .Include(u => u.UserRole)
+                   .ThenInclude(ur => ur.Role)
                 .Select(u => new UserDTO
                 {
                     Id = u.Id,
                     Email = u.Email,
                     UserName = u.UserName,
-                    Roles = u.UserRoles.Select(ur => ur.Role.RoleName).ToList()
-                })
-                .ToListAsync();
+                    Role =  u.UserRole.Role.RoleName,
+                }).ToListAsync();
 
             return users;
         }
 
-        public async Task<IEnumerable<Role>> GetAllUserRolesAsync(int userId)
+       /* public async Task<IEnumerable<Role>> GetAllUserRolesAsync(int userId)
         {
             var roles = await _context.Users
                     .Where(u => u.Id == userId)
@@ -49,11 +51,20 @@ namespace Data_Access_Layer.Repositories
                     .ToListAsync();
 
             return roles;
-        }
+        }*/
 
         public async Task<User> GetUserById(int userId)
         {
             var user = await _context.Users.Where(u => u.Id == userId).FirstOrDefaultAsync();
+
+            return user;
+        }
+
+        public async Task<User> GetUserwithRoleById(int userId)
+        {
+            var user = await _context.Users
+                .Include(u => u.UserRole)
+                   .Where(u => u.Id == userId).FirstOrDefaultAsync();
 
             return user;
         }
@@ -77,5 +88,11 @@ namespace Data_Access_Layer.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task UpdateUserAsync(User user)
+        {
+            _context.Users.Update(user);
+
+            await _context.SaveChangesAsync();
+        }
     }
 }

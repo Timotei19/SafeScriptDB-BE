@@ -2,6 +2,7 @@
 using Data_Access_Layer.Repositories;
 using Data_Access_Layer.RepositoryInterfaces;
 using Microsoft.AspNetCore.Identity;
+using Models.AppConstants;
 using Models.DTOs;
 using Models.Entities;
 using Models.Models;
@@ -30,10 +31,10 @@ namespace Business_Logic_Layer.Services
             return await _userRepository.GetAllUsersWithRolesAsync();
         }
 
-        public async Task<IEnumerable<Role>> GetAllUserRolesAsync(int userId)
-        {
-            return await _userRepository.GetAllUserRolesAsync(userId);
-        }
+        //public async Task<IEnumerable<Role>> GetAllUserRolesAsync(int userId)
+        //{
+        //    return await _userRepository.GetAllUserRolesAsync(userId);
+        //}
 
         public async Task DeleteUserAsync(int userId)
         {
@@ -60,7 +61,7 @@ namespace Business_Logic_Layer.Services
 
             if (user == null)
             {
-                throw new Exception("User doesn't exists");
+                throw new Exception($"User not found.");
             }
 
             var userStatistics = await _auditRepository.GetUserStatisticsAsync(request);
@@ -68,6 +69,48 @@ namespace Business_Logic_Layer.Services
             userStatistics.Email = user.Email;
 
             return userStatistics;
+        }
+
+        public async Task<UserDTO> UpdateUserAsync(UserDTO updateUserDto)
+        {
+            var user = await _userRepository.GetUserwithRoleById(updateUserDto.Id);
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            // Update user properties
+            user.UserName = updateUserDto.UserName;
+            user.Email = updateUserDto.Email;
+
+            if (Enum.TryParse(typeof(Enums.Role), updateUserDto.Role, true, out var roleEnum))
+            {
+                // Ensure UserRole is initialized
+                user.UserRole ??= new UserRole();
+
+                // Assign RoleId
+                user.UserRole.RoleId = (int)roleEnum;
+            }
+            else
+            {
+                // Log the invalid role for debugging
+                var errorMessage = $"Invalid role: {updateUserDto.Role}";
+                // Example: LogError(errorMessage);
+
+                throw new ArgumentException(errorMessage);
+            }
+
+
+            await _userRepository.UpdateUserAsync(user);
+
+            return new UserDTO
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                Role = Enum.GetName(typeof(Enums.Role), user.UserRole.RoleId) ?? "Unknown"
+            };
         }
     }
 }

@@ -9,10 +9,14 @@ namespace Data_Access_Layer.RepositoryInterfaces
 
         Task<List<UserDTO>> GetAllUsersWithRolesAsync();
 
-        Task<IEnumerable<Role>> GetAllUserRolesAsync(int userId);
+        //Task<IEnumerable<Role>> GetAllUserRolesAsync(int userId);
 
         Task<User> GetUserById(int userId);
 
         Task DeleteUser(User user);
+
+        Task UpdateUserAsync(User user);
+
+        Task<User> GetUserwithRoleById(int userId);
     }
 }
