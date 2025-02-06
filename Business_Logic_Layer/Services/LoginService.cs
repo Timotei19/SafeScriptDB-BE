@@ -4,7 +4,6 @@ using Data_Access_Layer.RepositoryInterfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Models.AppConstants;
 using Models.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -48,7 +47,9 @@ namespace Business_Logic_Layer.Services
 
                 _userContext.UserId = user.Id;
 
-                await _userManager.AddToRoleAsync(user, Enums.Role.User.ToString());
+                var userWithRole = await _userRepository.GetUserwithRoleById(user.Id);
+
+                loginResult.Role = userWithRole.UserRole.RoleId;
 
                 return loginResult;
             }

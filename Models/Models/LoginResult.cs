@@ -7,5 +7,7 @@ namespace Business_Logic_Layer.Services
         public ApplicationUser User { get; set; }
 
         public string AccessToken { get; set; }
+
+        public int Role { get; set; }
     }
 }

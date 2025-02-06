@@ -1,5 +1,6 @@
 ﻿using Models.DTOs;
 using Microsoft.AspNetCore.Http;
+using Models.Models;
 
 namespace Business_Logic_Layer.IUpdateScripts
 {
@@ -7,6 +8,6 @@ namespace Business_Logic_Layer.IUpdateScripts
     {
         public List<string> GetDatabases(DbServer credentials);
 
-        Task<List<string>> ExecuteSqlScripts(List<string> databases, List<IFormFile> files);
+        Task<ScriptsResultModel> ExecuteSqlScripts(List<string> databases, List<IFormFile> files);
     }
 }

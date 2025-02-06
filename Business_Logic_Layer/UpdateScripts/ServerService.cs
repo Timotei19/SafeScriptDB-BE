@@ -8,6 +8,7 @@ using Microsoft.Data.SqlClient;
 using Models.AppConstants;
 using Models.DTOs;
 using Models.Entities;
+using Models.Models;
 using System.Data;
 using System.Text;
 
@@ -49,9 +50,11 @@ namespace Business_Logic_Layer.UpdateScripts
             return mainTenants;
         }
 
-        public async Task<List<string>> ExecuteSqlScripts(List<string> tenantDatabases, List<IFormFile> files)
+        public async Task<ScriptsResultModel> ExecuteSqlScripts(List<string> tenantDatabases, List<IFormFile> files)
         {
-            List<string> results = new List<string>();
+            var results = new ScriptsResultModel();
+            int success = 0;
+            int failed = 0;
 
             foreach (var tenant in tenantDatabases)
             {
@@ -110,17 +113,18 @@ namespace Business_Logic_Layer.UpdateScripts
                                 failedAuditItem.ResultMessage = ex.Message;
 
                                 transaction.Rollback();
-
+                                results.Failed++;
                                 audit.RollbackDone = true;
 
                                 await AddExceptionAudit(ex, audit);
+                                continue;
                             }
                         }
                     }
 
                     audit.EndDate = DateTime.Now;
                     audit.StatusId = (int)Enums.Status.Finished;
-
+                    results.Success++;
                     //await AddAudit(audit);
                 }
                 catch (Exception ex)

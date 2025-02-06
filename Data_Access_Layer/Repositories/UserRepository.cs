@@ -1,10 +1,7 @@
 ﻿using Data_Access_Layer.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.SqlServer.Management.Smo;
-using Models.AppConstants;
-using Models.Entities;
-using System.CodeDom;
+using Models.DTOs;
 using User = Models.Entities.User;
 
 namespace Data_Access_Layer.Repositories
@@ -25,33 +22,37 @@ namespace Data_Access_Layer.Repositories
             return await _context.Users.ToListAsync();
         }
 
-        public async Task<List<UserDTO>> GetAllUsersWithRolesAsync()
+        public async Task<PagedResult<UserDTO>> GetPagedUsersWithRolesAsync(PagedUserRequest pagedUserRequest)
         {
-                var users = await _context.Users
+            var query = _context.Users
                 .Include(u => u.UserRole)
-                   .ThenInclude(ur => ur.Role)
-                .Select(u => new UserDTO
-                {
-                    Id = u.Id,
-                    Email = u.Email,
-                    UserName = u.UserName,
-                    Role =  u.UserRole.Role.RoleName,
-                }).ToListAsync();
+                .ThenInclude(ur => ur.Role)
+                .AsQueryable();
 
-            return users;
+
+            query = pagedUserRequest.SortDesc
+                ? query.OrderByDescending(e => EF.Property<object>(e, pagedUserRequest.SortBy))
+                : query.OrderBy(e => EF.Property<object>(e, pagedUserRequest.SortBy));
+
+            var totalRecords = await query.CountAsync();
+            var users = await query.Skip((pagedUserRequest.Page - 1) * pagedUserRequest.PageSize)
+                                   .Take(pagedUserRequest.PageSize)
+                                   .Select(u => new UserDTO
+                                   {
+                                       Id = u.Id,
+                                       UserName = u.UserName,
+                                       Email = u.Email,
+                                       Role = u.UserRole.Role.RoleName
+                                   })
+                                   .ToListAsync();
+
+            return new PagedResult<UserDTO>
+            {
+                Records = users,
+                TotalRecords = totalRecords
+            };
         }
 
-       /* public async Task<IEnumerable<Role>> GetAllUserRolesAsync(int userId)
-        {
-            var roles = await _context.Users
-                    .Where(u => u.Id == userId)
-                    .Include(u => u.UserRoles)
-                        .ThenInclude(ur => ur.Role)
-                    .SelectMany(u => u.UserRoles.Select(ur => ur.Role))
-                    .ToListAsync();
-
-            return roles;
-        }*/
 
         public async Task<User> GetUserById(int userId)
         {

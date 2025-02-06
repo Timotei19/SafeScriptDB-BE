@@ -1,4 +1,5 @@
 ﻿using Data_Access_Layer.Repositories;
+using Models.DTOs;
 using Models.Entities;
 
 namespace Data_Access_Layer.RepositoryInterfaces
@@ -7,9 +8,7 @@ namespace Data_Access_Layer.RepositoryInterfaces
     {
         Task<List<User>> GetAllUsersAsync();
 
-        Task<List<UserDTO>> GetAllUsersWithRolesAsync();
-
-        //Task<IEnumerable<Role>> GetAllUserRolesAsync(int userId);
+        Task<PagedResult<UserDTO>> GetPagedUsersWithRolesAsync(PagedUserRequest pagedUserRequest);
 
         Task<User> GetUserById(int userId);
 

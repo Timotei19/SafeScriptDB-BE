@@ -8,13 +8,12 @@ namespace Business_Logic_Layer.Interfaces
     {
         Task<List<User>> GetAllUsersAsync();
 
-        Task<List<UserDTO>> GetAllUsersWithRolesAsync();
-
-        //Task<IEnumerable<Role>> GetAllUserRolesAsync(int userId);
+        Task<PagedResult<UserDTO>> GetPagedUsersWithRolesAsync(PagedUserRequest pagedUserRequest);
 
         Task DeleteUserAsync(int userId);
 
         Task<UserStatisticsReponse> GetUserStatisticsAsync(UserStatisticsRequest request);
+
         Task<UserDTO> UpdateUserAsync(UserDTO updateUserDto);
     }
 }

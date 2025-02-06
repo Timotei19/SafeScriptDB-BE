@@ -24,6 +24,9 @@ public class RoleRepository : IRoleRepository
         };
 
         await _context.UserRole.AddAsync(userRole);
+
+
+        await _context.SaveChangesAsync();
     }
 }
 

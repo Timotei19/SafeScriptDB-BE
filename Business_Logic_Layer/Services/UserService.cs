@@ -26,15 +26,11 @@ namespace Business_Logic_Layer.Services
             return await _userRepository.GetAllUsersAsync();
         }
 
-        public async Task<List<UserDTO>> GetAllUsersWithRolesAsync()
-        {
-            return await _userRepository.GetAllUsersWithRolesAsync();
-        }
 
-        //public async Task<IEnumerable<Role>> GetAllUserRolesAsync(int userId)
-        //{
-        //    return await _userRepository.GetAllUserRolesAsync(userId);
-        //}
+        public async Task<PagedResult<UserDTO>> GetPagedUsersWithRolesAsync(PagedUserRequest pagedUserRequest)
+        {
+            return await _userRepository.GetPagedUsersWithRolesAsync(pagedUserRequest);
+        }
 
         public async Task DeleteUserAsync(int userId)
         {
@@ -80,23 +76,18 @@ namespace Business_Logic_Layer.Services
                 return null;
             }
 
-            // Update user properties
             user.UserName = updateUserDto.UserName;
             user.Email = updateUserDto.Email;
 
             if (Enum.TryParse(typeof(Enums.Role), updateUserDto.Role, true, out var roleEnum))
             {
-                // Ensure UserRole is initialized
                 user.UserRole ??= new UserRole();
 
-                // Assign RoleId
                 user.UserRole.RoleId = (int)roleEnum;
             }
             else
             {
-                // Log the invalid role for debugging
                 var errorMessage = $"Invalid role: {updateUserDto.Role}";
-                // Example: LogError(errorMessage);
 
                 throw new ArgumentException(errorMessage);
             }

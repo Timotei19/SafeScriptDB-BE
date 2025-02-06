@@ -1,6 +1,7 @@
 ﻿using Business_Logic_Layer.IUpdateScripts;
 using Microsoft.AspNetCore.Mvc;
 using Models.DTOs;
+using Models.Models;
 
 namespace SafeScriptDb_BE.Controllers
 {
@@ -32,7 +33,7 @@ namespace SafeScriptDb_BE.Controllers
         }
 
         [HttpPost("executeSqlOnTenants")]
-        [ProducesResponseType(typeof(List<string>), 200)]
+        [ProducesResponseType(typeof(ScriptsResultModel), 200)]
         public async Task<IActionResult> ExecuteSqlOnTenants([FromForm] List<string> databases, [FromForm] List<IFormFile> files)
         {
             if (files == null || files.Count == 0)
@@ -42,9 +43,9 @@ namespace SafeScriptDb_BE.Controllers
                 return BadRequest("No databases selected.");
 
 
-            await _serverService.ExecuteSqlScripts(databases, files);
+            var results = await _serverService.ExecuteSqlScripts(databases, files);
 
-            return Ok();
+            return Ok(results);
         }
     }
 }

@@ -52,7 +52,7 @@ builder.Services
     options.Password.RequireLowercase = false;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase = false;
-    options.Password.RequiredLength = 15;
+    options.Password.RequiredLength = 6;
     options.Password.RequiredUniqueChars = 1;
 })
     .AddEntityFrameworkStores<Data_Access_Layer.Contexts.IdentityDbContext>()

@@ -23,23 +23,22 @@ namespace SafeScriptDb_BE.Controllers
         }
 
         //[Authorize(Roles = "Admin")]
-        [HttpGet("GetAllUsers")]
+        [HttpGet("GetPagedUsers")]
         [ProducesResponseType(200)]
         [ProducesResponseType(typeof(List<UserDTO>), 200)]
-        public async Task<IActionResult> GetAllUsers()
+        public async Task<IActionResult> GetPagedUsers([FromQuery] PagedUserRequest pagedRequest)
         {
-            var users = await _userService.GetAllUsersWithRolesAsync();
+            try
+            {
+
+            }catch(Exception ex)
+            {
+                return Ok();
+            }
+            var users = await _userService.GetPagedUsersWithRolesAsync(pagedRequest);
             return Ok(users);
         }
 
-        //[HttpGet("GetUserRoles/{userId}")]
-        //[ProducesResponseType(200)]
-        //[ProducesResponseType(typeof(IEnumerable<Role>), 200)]
-        //public async Task<IActionResult> GetAllUserRoles(int userId)
-        //{
-        //    var roles = await _userService.GetAllUserRolesAsync(userId);
-        //    return Ok(roles);
-        //}
 
         [HttpDelete("DeleteUser/{userId}")]
         [ProducesResponseType(200)]
